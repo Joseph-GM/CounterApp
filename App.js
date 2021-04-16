@@ -17,6 +17,7 @@ import {
   useColorScheme,
   View,
   NativeModules,
+  NativeEventEmitter,
 } from 'react-native';
 
 import {
@@ -27,7 +28,32 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+const CounterEvents = new NativeEventEmitter(NativeModules.Counter)
+
+CounterEvents.addListener(
+  "onIncrement",
+  res => console.log("onIncrement event", res)
+)
+
 console.log("NativeModules = ", NativeModules.Counter);
+NativeModules.Counter.increment();
+NativeModules.Counter.getCount((first, ...others) => {
+  console.log("in React Native **** Count in ", first)
+  console.log("other arguemtns", others)
+})
+
+async function decrement() {
+  try{
+    const res = await NativeModules.Counter.decrement()
+    console.log(res)
+  } catch(e) {
+    console.log(e.message, e.code)
+  }
+}
+
+decrement()
+decrement()
+
 
 const Section = ({children, title}): Node => {
   const isDarkMode = useColorScheme() === 'dark';
